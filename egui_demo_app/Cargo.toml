@@ -15,7 +15,7 @@ crate-type = ["cdylib", "rlib"]
 
 
 [features]
-default = ["persistence"]
+default = ["persistence", "http"]
 http = ["egui_demo_lib/http"]
 persistence = ["eframe/persistence", "egui_demo_lib/persistence"]
 screen_reader = ["eframe/screen_reader"] # experimental

@@ -1,3 +1,9 @@
+cfg_if::cfg_if! {
+    if #[cfg(target_os="macos")] {
+        use winit::platform::macos::WindowBuilderExtMacOS;
+    }
+}
+
 pub fn points_to_size(points: egui::Vec2) -> winit::dpi::LogicalSize<f64> {
     winit::dpi::LogicalSize {
         width: points.x as f64,
@@ -32,6 +38,19 @@ pub fn window_builder(
         .with_resizable(*resizable)
         .with_transparent(*transparent)
         .with_window_icon(window_icon);
+
+    cfg_if::cfg_if! {
+        if #[cfg(target_os="macos")] {
+            if window_builder.window.decorations {
+                window_builder = window_builder
+                .with_fullsize_content_view(true)
+                .with_title_hidden(true)
+                .with_decorations(true)
+                // .with_titlebar_buttons_hidden(true)
+                .with_titlebar_transparent(true);
+            }
+        }
+    }
 
     if let Some(min_size) = *min_window_size {
         window_builder = window_builder.with_min_inner_size(points_to_size(min_size));

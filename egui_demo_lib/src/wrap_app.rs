@@ -1,3 +1,5 @@
+use egui::Visuals;
+
 /// All the different demo apps.
 #[derive(Default)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
@@ -44,7 +46,7 @@ impl epi::App for WrapApp {
 
     fn setup(
         &mut self,
-        _ctx: &egui::Context,
+        ctx: &egui::Context,
         _frame: &epi::Frame,
         _storage: Option<&dyn epi::Storage>,
     ) {
@@ -52,6 +54,7 @@ impl epi::App for WrapApp {
         if let Some(storage) = _storage {
             *self = epi::get_value(storage, epi::APP_KEY).unwrap_or_default();
         }
+        ctx.set_visuals(Visuals::dark())
     }
 
     #[cfg(feature = "persistence")]
@@ -77,10 +80,21 @@ impl epi::App for WrapApp {
         if self.selected_anchor.is_empty() {
             self.selected_anchor = self.apps.iter_mut().next().unwrap().0.to_owned();
         }
-
+        // egui::TopBottomPanel::top("title_space").show(ctx, |ui| {
+        //     ui.centered_and_justified(|ui| {
+        //         ui.label("Demo application");
+        //     });
+        //     ui.label("Demo application");
+        // });
         egui::TopBottomPanel::top("wrap_app_top_bar").show(ctx, |ui| {
             egui::trace!(ui);
-            self.bar_contents(ui, frame);
+            ui.with_layout(egui::Layout::top_down_justified(egui::Align::Center), |ui| {
+                ui.heading("😃😃Demo application😃😃");
+            });
+            self.bar_contents(ctx, ui, frame);
+        });
+        egui::TopBottomPanel::bottom("wrap_app_bottom").show(ctx, |ui| {
+            ui.label("this is a status bottom");
         });
 
         self.backend_panel.update(ctx, frame);
@@ -128,7 +142,7 @@ impl epi::App for WrapApp {
 }
 
 impl WrapApp {
-    fn bar_contents(&mut self, ui: &mut egui::Ui, frame: &epi::Frame) {
+    fn bar_contents(&mut self, ctx: &egui::Context, ui: &mut egui::Ui, frame: &epi::Frame) {
         // A menu-bar is a horizontal layout with some special styles applied.
         // egui::menu::bar(ui, |ui| {
         ui.horizontal_wrapped(|ui| {
@@ -163,6 +177,16 @@ impl WrapApp {
                 }
 
                 egui::warn_if_debug_build(ui);
+
+                if ui.button("quit")
+                    .on_hover_ui(|_| {
+                        egui::show_tooltip(ctx, egui::Id::new("my_tooltip"), |ui| {
+                            ui.label("Helpful text");
+                        });
+                    })
+                    .clicked() {
+                    frame.quit();
+                }
             });
         });
     }

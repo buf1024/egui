@@ -1013,6 +1013,7 @@ dependencies = [
 name = "egui-winit"
 version = "0.17.0"
 dependencies = [
+ "cfg-if 1.0.0",
  "copypasta",
  "dark-light",
  "egui",
